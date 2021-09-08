@@ -20,5 +20,8 @@
     "express": "file:express",
     "express-generator": "^4.16.1",
     "nodemon": "^2.0.12"
+  },
+  "devDependencies": {
+    "prisma": "^3.0.1"
   }
 }
