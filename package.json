@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/mathildeleg/groupomania_backend/issues"
   },
-  "homepage": "https://github.com/mathildeleg/groupomania_backend#readme"
+  "homepage": "https://github.com/mathildeleg/groupomania_backend#readme",
+  "dependencies": {
+    "express": "file:express"
+  }
 }
