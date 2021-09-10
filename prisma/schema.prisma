@@ -9,11 +9,11 @@ generator client {
 
 model User {
   userId          Int       @id @default(autoincrement())  
-  admins          Administrator[]
-  userForums      UserForum[]
-  posts           Post[]
-  likes           UserLike[]
-  comments        Comment[]
+  admin           Administrator?
+  userForum       UserForum?
+  post            Post?
+  like            UserLike?
+  comment         Comment?
   userProfile     UserProfile @relation(fields: [profileId], references: [profileId])
   profileId       Int
 }
@@ -59,8 +59,8 @@ model Post {
   forumId         Int       
   content         Content   @relation(fields: [contentId], references: [contentId])
   contentId       Int
-  userLikes       UserLike[]
-  userComments    Comment[]
+  userLikes       UserLike?
+  userComments    Comment?
   createdAt       DateTime  @default(now())
 }
 
