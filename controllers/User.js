@@ -1,13 +1,15 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
 
 exports.signup = async (req, res) => {
     const userProfile = req.body.userProfile;
-        const { email, password, firstName, lastName, avatar } = userProfile;
-        const hashedPassword = await bcrypt.hash(userProfile.password, 10)
-        try {
+    const { email, password, firstName, lastName, avatar } = userProfile;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt)
+    try {
         const newUser = await prisma.user.create({
             data: {
                 userProfile: {
@@ -22,6 +24,38 @@ exports.signup = async (req, res) => {
             },
         });
         return res.json(newUser);
+    } catch(error) {
+        console.log(error);
+    }
+};
+
+exports.login = async (req, res) => {
+    const user = await prisma.userProfile.findUnique({
+        where: { 
+            email: req.body.email,
+        }
+    })
+    .user()
+    .userProfile()
+    try {
+        if (!user){
+            return res.status(401).json({ error: 'Utilisateur non trouvé !' })
+        } 
+        const matchedPassword = await bcrypt.compare(req.body.password, user.password)
+        try {
+            if (!matchedPassword){
+                return res.status(401).json({ error: 'Mot de passe incorrect !' })
+            }
+        } finally {
+            res.json({
+                userId: user.userId,
+                token: jwt.sign(
+                    { userId: user.userId },
+                    process.env.JWT_PRIVATE_KEY,
+                    { expiresIn: '24h' }
+                )
+            })
+        }
     } catch(error) {
         console.log(error);
     }
