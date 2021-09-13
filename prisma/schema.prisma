@@ -44,8 +44,8 @@ model UserForum {
 
 model Forum {
   forumId         Int       @id @default(autoincrement()) 
-  userForums      UserForum[]
-  posts           Post[]
+  userForums      UserForum?
+  posts           Post?
   title           String
   description     String
   createdAt       DateTime  @default(now())
