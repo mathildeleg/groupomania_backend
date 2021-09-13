@@ -4,6 +4,7 @@ const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
 
 const userRoutes = require('./routes/User');
+const profileRoutes = require('./routes/Profile');
 
 const app = express();
 
@@ -20,18 +21,7 @@ app.get('/', (req, res, next) => {
     res.send('I am working!');
 })
 
-// app.get('/byId/:id', async (req, res) => {
-//     const id = req.params.id;
-//     console.log(id);
-//     const user = await prisma.user.findUnique({
-//         where: {
-//             userId: Number(id),
-//         }
-//     });
-//     console.log(user);
-//     res.json(user);
-// });
-
 app.use('/api/auth', userRoutes);
+app.use('/api/profile', profileRoutes);
 
 module.exports = app;
