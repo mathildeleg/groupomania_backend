@@ -28,12 +28,10 @@ exports.updateProfile = async (req, res, next) => {
 
 exports.deleteProfile = async (req, res, next) => {
     const id = req.params.id;
-    console.log(id);
     const deletedProfile = await prisma.userProfile.delete({
         where: {
             profileId: Number(id),
         },
     });
-    console.log(deletedProfile);
     res.json(deletedProfile);
 }
