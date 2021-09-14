@@ -23,6 +23,20 @@ exports.signup = async (req, res) => {
                 },
             },
         });
+        const userForum1 = await prisma.userForum.create({
+            data: {
+                forumId: 1,
+                userId: newUser.userId,
+            }
+        });
+        const userForum2 = await prisma.userForum.create({
+            data: {
+                forumId: 2,
+                userId: newUser.userId,
+            }
+        });
+        console.log(userForum1);
+        console.log(userForum2);
         return res.json(newUser);
     } catch(error) {
         console.log(error);
