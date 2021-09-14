@@ -10,10 +10,10 @@ generator client {
 model User {
   userId          Int       @id @default(autoincrement())  
   admin           Administrator?
-  userForum       UserForum?
-  post            Post?
-  like            UserLike?
-  comment         Comment?
+  userForum       UserForum[]
+  post            Post[]
+  like            UserLike[]
+  comment         Comment[]
   userProfile     UserProfile @relation(fields: [profileId], references: [profileId])
   profileId       Int
 }

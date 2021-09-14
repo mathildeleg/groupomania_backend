@@ -11,8 +11,10 @@ CREATE TABLE `User` (
 CREATE TABLE `UserProfile` (
     `profileId` INTEGER NOT NULL AUTO_INCREMENT,
     `email` VARCHAR(191) NOT NULL,
+    `password` VARCHAR(191) NOT NULL,
     `firstName` VARCHAR(191) NOT NULL,
     `lastName` VARCHAR(191) NOT NULL,
+    `avatar` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `UserProfile_email_key`(`email`),
     PRIMARY KEY (`profileId`)
@@ -23,6 +25,7 @@ CREATE TABLE `Administrator` (
     `adminId` INTEGER NOT NULL AUTO_INCREMENT,
     `userId` INTEGER NOT NULL,
 
+    UNIQUE INDEX `Administrator_userId_unique`(`userId`),
     PRIMARY KEY (`adminId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -32,6 +35,7 @@ CREATE TABLE `UserForum` (
     `forumId` INTEGER NOT NULL,
     `userId` INTEGER NOT NULL,
 
+    UNIQUE INDEX `UserForum_forumId_unique`(`forumId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -53,6 +57,7 @@ CREATE TABLE `Post` (
     `contentId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `Post_forumId_unique`(`forumId`),
     UNIQUE INDEX `Post_contentId_unique`(`contentId`),
     PRIMARY KEY (`postId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -78,7 +83,7 @@ CREATE TABLE `ContentUrl` (
 -- CreateTable
 CREATE TABLE `ContentImage` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `image_path` VARCHAR(191) NOT NULL,
+    `imagePath` VARCHAR(191) NOT NULL,
     `contentId` INTEGER NOT NULL,
 
     UNIQUE INDEX `ContentImage_contentId_unique`(`contentId`),
@@ -92,6 +97,7 @@ CREATE TABLE `UserLike` (
     `postId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `UserLike_postId_unique`(`postId`),
     PRIMARY KEY (`likeId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -103,6 +109,7 @@ CREATE TABLE `Comment` (
     `commentMessage` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    UNIQUE INDEX `Comment_postId_unique`(`postId`),
     PRIMARY KEY (`commentId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
