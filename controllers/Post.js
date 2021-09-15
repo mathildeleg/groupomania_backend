@@ -48,3 +48,61 @@ exports.createPost = async (req, res, next) => {
     }
     return res.json(newPost);
 }
+
+exports.updatePost = async (req, res, next) => {
+    const id = req.params.id;
+    const forumId = req.params.forumId;
+    const userId = req.userId;
+    const postMessage = req.body;
+    const updatedPost = await prisma.post.update({
+        where: {
+            postId: Number(id),
+        },
+        data: {
+            content: {
+                update: {
+                    postMessage,
+                }
+            },
+            forum: {
+                connect: {
+                    forumId: Number(forumId),   
+                }
+            },
+            user: {
+                connect: {
+                    userId: userId,
+                }
+            }
+        },
+    });
+    return res.json(updatedPost);
+}
+
+exports.getOnePost = async (req, res, next) => {
+    const id = req.params.id;
+    const post = await prisma.post.findUnique({
+        where: {
+            postId: Number(id),
+        },
+        select: {
+            content: {
+                select: {
+                    postMessage: true,
+                    contentImg: true,
+                }
+            }
+        }
+    });
+    return res.json(post);
+}
+
+exports.deletePost = async (req, res, next) => {
+    const id = req.params.id;
+    const post = await prisma.post.delete({
+        where: {
+            postId: Number(id),
+        }
+    });
+    return res.json(post);
+}
