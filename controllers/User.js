@@ -44,27 +44,33 @@ exports.signup = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-    const user = await prisma.userProfile.findUnique({
+    const userProfile = await prisma.userProfile.findUnique({
         where: { 
             email: req.body.email,
-        }
-    })
-    .user()
-    .userProfile()
+        },
+        select: {
+            user: {
+                select: {
+                    userId: true,
+                }
+            },
+            password: true,
+        },
+    });
     try {
-        if (!user){
+        if (!userProfile){
             return res.status(401).json({ error: 'Utilisateur non trouvé !' })
         } 
-        const matchedPassword = await bcrypt.compare(req.body.password, user.password)
+        const matchedPassword = await bcrypt.compare(req.body.password, userProfile.password)
         try {
             if (!matchedPassword){
                 return res.status(401).json({ error: 'Mot de passe incorrect !' })
             }
         } finally {
-            res.json({
-                userId: user.userId,
+            return res.json({
+                userId: userProfile.user.userId,
                 token: jwt.sign(
-                    { userId: user.userId },
+                    { userId: userProfile.user.userId },
                     process.env.JWT_PRIVATE_KEY,
                     { expiresIn: '24h' }
                 )
