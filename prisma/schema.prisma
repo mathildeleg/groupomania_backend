@@ -14,7 +14,7 @@ model User {
   post            Post[]
   like            UserLike[]
   comment         Comment[]
-  userProfile     UserProfile @relation(fields: [profileId], references: [profileId])
+  userProfile     UserProfile @relation(fields: [profileId], references: [profileId], onDelete: Cascade)
   profileId       Int
 }
 
@@ -38,14 +38,14 @@ model UserForum {
   id              Int       @id @default(autoincrement()) 
   forum           Forum     @relation(fields: [forumId], references: [forumId])
   forumId         Int       
-  user            User      @relation(fields: [userId], references: [userId])
+  user            User      @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId          Int         
 }
 
 model Forum {
   forumId         Int       @id @default(autoincrement()) 
-  userForums      UserForum?
-  posts           Post?
+  userForums      UserForum[]
+  posts           Post[]
   title           String
   description     String
   createdAt       DateTime  @default(now())
@@ -59,8 +59,8 @@ model Post {
   forumId         Int       
   content         Content   @relation(fields: [contentId], references: [contentId])
   contentId       Int
-  userLikes       UserLike?
-  userComments    Comment?
+  userLikes       UserLike[]
+  userComments    Comment[]
   createdAt       DateTime  @default(now())
 }
 

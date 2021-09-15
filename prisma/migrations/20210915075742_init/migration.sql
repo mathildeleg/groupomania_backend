@@ -35,7 +35,6 @@ CREATE TABLE `UserForum` (
     `forumId` INTEGER NOT NULL,
     `userId` INTEGER NOT NULL,
 
-    UNIQUE INDEX `UserForum_forumId_unique`(`forumId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -57,7 +56,6 @@ CREATE TABLE `Post` (
     `contentId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
-    UNIQUE INDEX `Post_forumId_unique`(`forumId`),
     UNIQUE INDEX `Post_contentId_unique`(`contentId`),
     PRIMARY KEY (`postId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -97,7 +95,6 @@ CREATE TABLE `UserLike` (
     `postId` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
-    UNIQUE INDEX `UserLike_postId_unique`(`postId`),
     PRIMARY KEY (`likeId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -109,12 +106,11 @@ CREATE TABLE `Comment` (
     `commentMessage` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
-    UNIQUE INDEX `Comment_postId_unique`(`postId`),
     PRIMARY KEY (`commentId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `User` ADD CONSTRAINT `User_profileId_fkey` FOREIGN KEY (`profileId`) REFERENCES `UserProfile`(`profileId`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `User` ADD CONSTRAINT `User_profileId_fkey` FOREIGN KEY (`profileId`) REFERENCES `UserProfile`(`profileId`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Administrator` ADD CONSTRAINT `Administrator_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`userId`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -123,7 +119,7 @@ ALTER TABLE `Administrator` ADD CONSTRAINT `Administrator_userId_fkey` FOREIGN K
 ALTER TABLE `UserForum` ADD CONSTRAINT `UserForum_forumId_fkey` FOREIGN KEY (`forumId`) REFERENCES `Forum`(`forumId`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `UserForum` ADD CONSTRAINT `UserForum_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`userId`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `UserForum` ADD CONSTRAINT `UserForum_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`userId`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Post` ADD CONSTRAINT `Post_creatorId_fkey` FOREIGN KEY (`creatorId`) REFERENCES `User`(`userId`) ON DELETE RESTRICT ON UPDATE CASCADE;
