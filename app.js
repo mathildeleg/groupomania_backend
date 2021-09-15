@@ -1,7 +1,5 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { PrismaClient } = require('@prisma/client')
-const prisma = new PrismaClient();
 
 const userRoutes = require('./routes/User');
 const profileRoutes = require('./routes/Profile');
@@ -18,10 +16,6 @@ app.use((req, res, next) => {
 })
 
 app.use(bodyParser.json());
-
-app.get('/', (req, res, next) => {
-    res.send('I am working!');
-})
 
 app.use('/api/auth', userRoutes);
 app.use('/api/profile', profileRoutes);
