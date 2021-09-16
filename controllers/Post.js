@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
+const fs = require('fs');
 
 // routes for content with image 
 exports.createPost = async (req, res, next) => {
@@ -33,7 +34,7 @@ exports.createPost = async (req, res, next) => {
             const contentId = newPost.contentId;
             const newContent = await prisma.contentImage.create({
                 data: {
-                    imagePath: imagePath,
+                    imagePath: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
                     content: {
                         connect: {
                             contentId: contentId,
@@ -127,13 +128,15 @@ exports.getAllPosts = async (req, res, next) => {
 
 exports.deletePost = async (req, res, next) => {
     const postId = req.params.postId;
-    const post = await prisma.post.delete({
-        where: {
-            postId: Number(postId),
-        }
+    const filename = post.imagePath.split('/images/')[1];
+    fs.unlink(`images/${filename}`, async () => { 
+        await prisma.post.delete({
+            where: {
+                postId: Number(postId),
+            }
+        });
     });
-    return res.json(post);
-}
+};
 
 // route to create a like
 exports.likePost = async (req, res, next) => {
