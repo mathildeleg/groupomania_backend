@@ -50,13 +50,13 @@ exports.createPost = async (req, res, next) => {
 }
 
 exports.updatePost = async (req, res, next) => {
-    const id = req.params.id;
+    const postId = req.params.id;
     const forumId = req.params.forumId;
     const userId = req.userId;
     const postMessage = req.body.postMessage;
     const updatedPost = await prisma.post.update({
         where: {
-            postId: Number(id),
+            postId: Number(postId),
         },
         data: {
             content: {
@@ -80,10 +80,10 @@ exports.updatePost = async (req, res, next) => {
 }
 
 exports.getOnePost = async (req, res, next) => {
-    const id = req.params.id;
+    const postId = req.params.id;
     const post = await prisma.post.findUnique({
         where: {
-            postId: Number(id),
+            postId: Number(postId),
         },
         select: {
             content: {
@@ -98,10 +98,10 @@ exports.getOnePost = async (req, res, next) => {
 }
 
 exports.deletePost = async (req, res, next) => {
-    const id = req.params.id;
+    const postId = req.params.id;
     const post = await prisma.post.delete({
         where: {
-            postId: Number(id),
+            postId: Number(postId),
         }
     });
     return res.json(post);
