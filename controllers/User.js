@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const passwordValidator = require('password-validator');
+const validator = require("email-validator");
 
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
@@ -21,6 +22,9 @@ exports.signup = async (req, res) => {
     const { email, password, firstName, lastName, avatar } = userProfile;
     if(!schema.validate(password)){
         return res.status(401).json({ error: 'Mot de passe non valide !' })
+    }
+    if(!validator.validate(email)){
+        return res.status(401).json({ error: 'Email non valide !' })
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt)
