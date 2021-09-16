@@ -104,6 +104,27 @@ exports.getOnePost = async (req, res, next) => {
     return res.json(post);
 }
 
+exports.getAllPosts = async (req, res, next) => {
+    const posts = await prisma.post.findMany({
+        select: {
+            content: {
+                select: {
+                    postMessage: true,
+                    contentImg: true,
+                }
+            },
+            userComments: {
+                select: {
+                    commentMessage: true,
+                    createdAt: true,
+                }
+            },
+            userLikes: true,
+        }
+    });
+    return res.json(posts);
+}
+
 exports.deletePost = async (req, res, next) => {
     const postId = req.params.postId;
     const post = await prisma.post.delete({
