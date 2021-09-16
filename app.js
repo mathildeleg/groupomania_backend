@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const helmet = require("helmet");
 require('dotenv/config');
 
 const userRoutes = require('./routes/User');
@@ -10,6 +11,8 @@ const postRoutes = require('./routes/Post');
 const commentRoutes = require('./routes/Comment');
 
 const app = express();
+
+app.use(helmet());
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
