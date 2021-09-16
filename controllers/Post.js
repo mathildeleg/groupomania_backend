@@ -53,7 +53,7 @@ exports.updatePost = async (req, res, next) => {
     const id = req.params.id;
     const forumId = req.params.forumId;
     const userId = req.userId;
-    const postMessage = req.body;
+    const postMessage = req.body.postMessage;
     const updatedPost = await prisma.post.update({
         where: {
             postId: Number(id),
@@ -61,8 +61,8 @@ exports.updatePost = async (req, res, next) => {
         data: {
             content: {
                 update: {
-                    postMessage,
-                }
+                    postMessage: postMessage,
+                },
             },
             forum: {
                 connect: {
