@@ -50,7 +50,7 @@ exports.createPost = async (req, res, next) => {
 }
 
 exports.updatePost = async (req, res, next) => {
-    const postId = req.params.id;
+    const postId = req.params.postId;
     const forumId = req.params.forumId;
     const userId = req.userId;
     const postMessage = req.body.postMessage;
@@ -80,7 +80,7 @@ exports.updatePost = async (req, res, next) => {
 }
 
 exports.getOnePost = async (req, res, next) => {
-    const postId = req.params.id;
+    const postId = req.params.postId;
     const post = await prisma.post.findUnique({
         where: {
             postId: Number(postId),
@@ -91,18 +91,51 @@ exports.getOnePost = async (req, res, next) => {
                     postMessage: true,
                     contentImg: true,
                 }
-            }
+            },
+            userComments: {
+                select: {
+                    commentMessage: true,
+                    createdAt: true,
+                }
+            },
+            userLikes: true,
         }
     });
     return res.json(post);
 }
 
 exports.deletePost = async (req, res, next) => {
-    const postId = req.params.id;
+    const postId = req.params.postId;
     const post = await prisma.post.delete({
         where: {
             postId: Number(postId),
         }
     });
     return res.json(post);
+}
+
+exports.likePost = async (req, res, next) => {
+    const postId = req.params.postId;
+    const userId = req.userId;
+    console.log(postId);
+    // const post = await prisma.post.findUnique({
+    //     where: {
+    //         postId: Number(postId),
+    //     },
+    // });
+    const like = await prisma.userLike.create({
+        data: {
+            post: {
+                connect: {
+                    postId: Number(postId),   
+                }
+            },
+            user: {
+                connect: {
+                    userId: userId,
+                }
+            }
+        },
+    });
+    return res.json(like);
 }
