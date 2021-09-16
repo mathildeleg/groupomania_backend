@@ -4,10 +4,14 @@ const fs = require('fs');
 
 // routes for content with image 
 exports.createPost = async (req, res, next) => {
+    // get forum id
     const forumId = req.params.forumId;
+    // get user id
     const userId = req.userId;
+    // get content of post
     const postMessage = req.body.postMessage;
     const imagePath = req.body.imagePath;
+    // create post
     const newPost = await prisma.post.create({
         data: {
             content: {
@@ -28,9 +32,11 @@ exports.createPost = async (req, res, next) => {
         },
     });
     try {
+        // check if post exists
         if(!newPost){
             return res.status(401).json({ error: 'Post non trouvé !' })
         } else {
+            // add image url to post
             const contentId = newPost.contentId;
             const newContent = await prisma.contentImage.create({
                 data: {
@@ -50,11 +56,17 @@ exports.createPost = async (req, res, next) => {
     return res.json(newPost);
 }
 
+// route to update a post (only message of the post, not the image)
 exports.updatePost = async (req, res, next) => {
+    // get post id
     const postId = req.params.postId;
+    // get forum id
     const forumId = req.params.forumId;
+    // get user id
     const userId = req.userId;
+    // get content of the post
     const postMessage = req.body.postMessage;
+    // update the post
     const updatedPost = await prisma.post.update({
         where: {
             postId: Number(postId),
@@ -80,8 +92,11 @@ exports.updatePost = async (req, res, next) => {
     return res.json(updatedPost);
 }
 
+// route to get one post
 exports.getOnePost = async (req, res, next) => {
+    // get post id
     const postId = req.params.postId;
+    // find post and display its content, its comments and its likes
     const post = await prisma.post.findUnique({
         where: {
             postId: Number(postId),
@@ -105,7 +120,9 @@ exports.getOnePost = async (req, res, next) => {
     return res.json(post);
 }
 
+// routes to get all posts
 exports.getAllPosts = async (req, res, next) => {
+    // find posts and display their contents, their comments and their likes
     const posts = await prisma.post.findMany({
         select: {
             content: {
@@ -126,9 +143,13 @@ exports.getAllPosts = async (req, res, next) => {
     return res.json(posts);
 }
 
+// route to delete a post
 exports.deletePost = async (req, res, next) => {
+    // get post id
     const postId = req.params.postId;
+    // get image from post
     const filename = post.imagePath.split('/images/')[1];
+    // delete image as well as the post
     fs.unlink(`images/${filename}`, async () => { 
         await prisma.post.delete({
             where: {
@@ -140,8 +161,11 @@ exports.deletePost = async (req, res, next) => {
 
 // route to create a like
 exports.likePost = async (req, res, next) => {
+    // get post id
     const postId = req.params.postId;
+    // get user id
     const userId = req.userId;
+    // user likes post
     const like = await prisma.userLike.create({
         data: {
             post: {
