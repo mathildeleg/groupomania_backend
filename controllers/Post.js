@@ -114,15 +114,10 @@ exports.deletePost = async (req, res, next) => {
     return res.json(post);
 }
 
+// route to create a like
 exports.likePost = async (req, res, next) => {
     const postId = req.params.postId;
     const userId = req.userId;
-    console.log(postId);
-    // const post = await prisma.post.findUnique({
-    //     where: {
-    //         postId: Number(postId),
-    //     },
-    // });
     const like = await prisma.userLike.create({
         data: {
             post: {
