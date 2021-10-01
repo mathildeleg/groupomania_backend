@@ -120,27 +120,52 @@ exports.getOnePost = async (req, res, next) => {
     return res.json(post);
 }
 
+function formatAllPosts(prismaAllPosts){
+    return prismaAllPosts.map(post => {
+        const { postId, createdAt, user, content, _count } = post;
+        const author = `${user.userProfile.firstName} ${user.userProfile.lastName}`;
+        const contentMessage = content.postMessage;
+        const contentImg = content.contentImg ? content.contentImg.imagePath : null;
+        const commentsCount = _count.userComments;
+        const likesCount = _count.userLikes;
+        const newPost = { postId, createdAt, author, contentMessage, contentImg, commentsCount, likesCount };
+        return newPost;
+    });
+}
+
 // routes to get all posts
 exports.getAllPosts = async (req, res, next) => {
     // find posts and display their contents, their comments and their likes
     const posts = await prisma.post.findMany({
         select: {
+            postId: true,
+            createdAt: true,
+            user: {
+                select: {
+                    userId: true,
+                    userProfile: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                        }
+                    }
+                }
+            },
             content: {
                 select: {
                     postMessage: true,
                     contentImg: true,
                 }
             },
-            userComments: {
+            _count: {
                 select: {
-                    commentMessage: true,
-                    createdAt: true,
+                    userComments: true,
+                    userLikes: true,
                 }
-            },
-            userLikes: true,
+            }
         }
     });
-    return res.json(posts);
+    return res.json(formatAllPosts(posts));
 }
 
 // route to delete a post
