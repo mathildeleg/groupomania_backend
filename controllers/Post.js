@@ -135,8 +135,12 @@ function formatAllPosts(prismaAllPosts){
 
 // routes to get all posts
 exports.getAllPosts = async (req, res, next) => {
+    const skip = parseInt(req.query.start) ?? 0;
+    const take = req.query.end ? parseInt(req.query.end) - skip : undefined ;
     // find posts and display their contents, their comments and their likes
     const posts = await prisma.post.findMany({
+        skip,
+        take,
         select: {
             postId: true,
             createdAt: true,
