@@ -28,11 +28,11 @@ exports.signup = async (req, res) => {
     const { email, password, firstName, lastName, avatar } = userProfile;
     // check if password follows valid schema
     if(!schema.validate(password)){
-        return res.status(401).json({ error: 'Mot de passe non valide !' })
+        return res.status(400).json({ error: 'Mot de passe non valide !' })
     }
     // check if email is valid
     if(!emailValidator.validate(email)){
-        return res.status(401).json({ error: 'Email non valide !' })
+        return res.status(400).json({ error: 'Email non valide !' })
     }
     // create hash for password
     const salt = await bcrypt.genSalt(10);
