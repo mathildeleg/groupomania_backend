@@ -143,7 +143,14 @@ exports.getOnePost = async (req, res, next) => {
 
 function formatAllPosts(prismaAllPosts){
     return prismaAllPosts.map(post => {
-        formatPost(post)
+        const { postId, createdAt, user, content, _count } = post;
+        const author = `${user.userProfile.firstName} ${user.userProfile.lastName}`;
+        const contentMessage = content.postMessage;
+        const contentImg = content.contentImg ? content.contentImg.imagePath : null;
+        const commentsCount = _count.userComments;
+        const likesCount = _count.userLikes;
+        const newPost = { postId, createdAt, author, contentMessage, contentImg, commentsCount, likesCount };
+        return newPost
     });
 }
 
