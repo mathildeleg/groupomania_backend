@@ -41,11 +41,37 @@ exports.getOneComment = async (req, res, next) => {
     return res.json(comment);
 };
 
+function formatAllComments(prismaAllComments){
+    return prismaAllComments.map(comment => {
+        const { postId, createdAt, user, commentMessage } = comment;
+        const author = `${user.userProfile.firstName} ${user.userProfile.lastName}`;
+        const newComment = { postId, createdAt, author, commentMessage };
+        return newComment;
+    });
+}
+
 // route to get comments of a post
 exports.getAllComments = async (req, res, next) => {
     // get all comments
-    const comments = await prisma.comment.findMany();
-    return res.json(comments);
+    const comments = await prisma.comment.findMany({
+        select: {
+            postId: true,
+            createdAt: true,
+            user: {
+                select: {
+                    userId: true,
+                    userProfile: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                        }
+                    }
+                }
+            },
+            commentMessage: true,
+        }
+    });
+    return res.json(formatAllComments(comments));
 }
 
 // route to update a comment
