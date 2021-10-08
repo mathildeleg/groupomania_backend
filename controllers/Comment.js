@@ -28,6 +28,13 @@ exports.commentPost = async (req, res, next) => {
     return res.json(newComment);
 };
 
+function formatComment(prismaComment){
+    const { postId, createdAt, user, commentMessage, commentId } = prismaComment;
+    const author = `${user.userProfile.firstName} ${user.userProfile.lastName}`;
+    const newComment = { postId, createdAt, author, commentMessage, commentId };
+    return newComment;
+}
+
 // route to get one comment of a post
 exports.getOneComment = async (req, res, next) => {
     // get comment id 
@@ -37,15 +44,32 @@ exports.getOneComment = async (req, res, next) => {
         where: {
             commentId: Number(commentId),
         },
+        select: {
+            postId: true,
+            createdAt: true,
+            user: {
+                select: {
+                    userId: true,
+                    userProfile: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                        }
+                    }
+                }
+            },
+            commentMessage: true,
+            commentId: true,
+        }
     });
-    return res.json(comment);
+    return res.json(formatComment(comment));
 };
 
 function formatAllComments(prismaAllComments){
     return prismaAllComments.map(comment => {
-        const { postId, createdAt, user, commentMessage } = comment;
+        const { postId, createdAt, user, commentMessage, commentId } = comment;
         const author = `${user.userProfile.firstName} ${user.userProfile.lastName}`;
-        const newComment = { postId, createdAt, author, commentMessage };
+        const newComment = { postId, createdAt, author, commentMessage, commentId };
         return newComment;
     });
 }
@@ -69,6 +93,7 @@ exports.getAllComments = async (req, res, next) => {
                 }
             },
             commentMessage: true,
+            commentId: true,
         }
     });
     return res.json(formatAllComments(comments));
@@ -84,37 +109,71 @@ exports.updateComment = async (req, res, next) => {
     const commentMessage = req.body.commentMessage;
     // get id of the comment 
     const commentId = req.params.commentId;
-    // update the content of the comment according to its id w/ post id and user id
-    const updatedComment = await prisma.comment.update({
+    const findComment = await prisma.comment.findUnique({
         where: {
             commentId: Number(commentId),
         },
-        data: {
-            commentMessage: commentMessage,
-            post: {
-                connect: {
-                    postId: Number(postId),   
-                }
-            },
+        select: {
             user: {
-                connect: {
-                    userId: userId,
+                select: {
+                    userId: true,
                 }
             }
-        },
+        }
     });
-    return res.json(updatedComment);
+    if(findComment.user.userId === userId){
+        // update the content of the comment according to its id w/ post id and user id
+        const updatedComment = await prisma.comment.update({
+            where: {
+                commentId: Number(commentId),
+            },
+            data: {
+                commentMessage: commentMessage,
+                post: {
+                    connect: {
+                        postId: Number(postId),   
+                    }
+                },
+                user: {
+                    connect: {
+                        userId: userId,
+                    }
+                }
+            },
+        });
+        return res.json(updatedComment);
+    } else {
+        res.status(401).json({error: error | "Unauthorised"});
+    }
 };
 
 // route to delete a comment
 exports.deleteComment = async (req, res, next) => {
     // get id of the comment
     const commentId = req.params.commentId;
-    // delete corresponding comment
-    const comment = await prisma.comment.delete({
+    const userId = req.userId;
+    // get id of commenter
+    const findComment = await prisma.comment.findUnique({
         where: {
             commentId: Number(commentId),
         },
+        select: {
+            user: {
+                select: {
+                    userId: true,
+                }
+            }
+        }
     });
-    return res.json(comment);
+    // check if user is the commenter, if he is he can delete the comment, otherwise he's not allowed
+    if(findComment.user.userId === userId){
+        const comment = await prisma.comment.delete({
+            where: {
+                commentId: Number(commentId),
+            },   
+        });
+        return res.json(comment);
+    } else {
+        res.status(401).json({error: error | "Unauthorised"});
+    }
 }
