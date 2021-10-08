@@ -67,29 +67,45 @@ exports.updatePost = async (req, res, next) => {
     // get content of the post
     const postMessage = req.body.postMessage;
     // update the post
-    const updatedPost = await prisma.post.update({
+    const findPost = await prisma.post.findUnique({
         where: {
             postId: Number(postId),
         },
-        data: {
-            content: {
-                update: {
-                    postMessage: postMessage,
-                },
-            },
-            forum: {
-                connect: {
-                    forumId: Number(forumId),   
-                }
-            },
+        select: {
             user: {
-                connect: {
-                    userId: userId,
+                select: {
+                    userId: true,
                 }
             }
-        },
+        }
     });
-    return res.json(updatedPost);
+    if(findPost.user.userId === userId){
+        const updatedPost = await prisma.post.update({
+            where: {
+                postId: Number(postId),
+            },
+            data: {
+                content: {
+                    update: {
+                        postMessage: postMessage,
+                    },
+                },
+                forum: {
+                    connect: {
+                        forumId: Number(forumId),   
+                    }
+                },
+                user: {
+                    connect: {
+                        userId: userId,
+                    }
+                }
+            },
+        });
+        return res.json(updatedPost);
+    } else {
+        res.status(401).json({error: error | "Unauthorised"});
+    }
 }
 
 function formatPost(prismaPost){
@@ -197,16 +213,39 @@ exports.getAllPosts = async (req, res, next) => {
 exports.deletePost = async (req, res, next) => {
     // get post id
     const postId = req.params.postId;
+    const userId = req.userId;
+    const findPost = await prisma.post.findUnique({
+        where: {
+            postId: Number(postId),
+        },
+        select: {
+            user: {
+                select: {
+                    userId: true,
+                }
+            }
+        }
+    });
     // get image from post
-    const filename = post.imagePath.split('/images/')[1];
-    // delete image as well as the post
-    fs.unlink(`images/${filename}`, async () => { 
-        await prisma.post.delete({
+    // const filename = post.imagePath.split('/images/')[1];
+    if(findPost.user.userId === userId){
+        const deletePost = await prisma.post.delete({
             where: {
                 postId: Number(postId),
             }
-        });
-    });
+        })
+    // delete image as well as the post
+    // fs.unlink(`images/${filename}`, async () => { 
+        // await prisma.post.delete({
+        //     where: {
+        //         postId: Number(postId),
+        //     }
+        // });
+    // });
+        return res.json(deletePost)
+    } else {
+        res.status(401).json({error: error | "Unauthorised"});
+    }
 };
 
 // route to create a like
