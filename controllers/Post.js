@@ -255,19 +255,35 @@ exports.likePost = async (req, res, next) => {
     // get user id
     const userId = req.userId;
     // user likes post
-    const like = await prisma.userLike.create({
-        data: {
-            post: {
-                connect: {
-                    postId: Number(postId),   
-                }
-            },
+    const findPost = await prisma.post.findUnique({
+        where: {
+            postId: Number(postId),
+        },
+        select: {
             user: {
-                connect: {
-                    userId: userId,
+                select: {
+                    userId: true,
                 }
             }
-        },
+        }
     });
-    return res.json(like);
+    if(findPost.user.userId !== userId){
+        const like = await prisma.userLike.create({
+            data: {
+                post: {
+                    connect: {
+                        postId: Number(postId),   
+                    }
+                },
+                user: {
+                    connect: {
+                        userId: userId,
+                    }
+                }
+            },
+        });
+        return res.json(like);
+    } else {
+        res.status(401).json({error: error | "Unauthorised"});
+    }
 }
