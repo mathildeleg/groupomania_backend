@@ -65,38 +65,48 @@ exports.getOneComment = async (req, res, next) => {
     return res.json(formatComment(comment));
 };
 
-function formatAllComments(prismaAllComments){
-    return prismaAllComments.map(comment => {
-        const { postId, createdAt, user, commentMessage, commentId } = comment;
+function formatCommentsOfPost(prismaPost){
+    const { userComments } = prismaPost;
+    const comment = userComments.map(comment => {
+        const { commentMessage, createdAt, user, commentId } = comment;
         const author = `${user.userProfile.firstName} ${user.userProfile.lastName}`;
-        const newComment = { postId, createdAt, author, commentMessage, commentId };
-        return newComment;
-    });
+        const newComment = {createdAt, author, commentMessage, commentId }
+        return newComment
+    })
+    const newPost = { comment };
+    return newPost
 }
 
 // route to get comments of a post
 exports.getAllComments = async (req, res, next) => {
-    // get all comments
-    const comments = await prisma.comment.findMany({
+    // get post id
+    const postId = req.params.postId;
+    // find post and display its content, its comments and its likes
+    const post = await prisma.post.findUnique({
+        where: {
+            postId: Number(postId),
+        },
         select: {
-            postId: true,
-            createdAt: true,
-            user: {
+            userComments: {
                 select: {
-                    userId: true,
-                    userProfile: {
+                    commentMessage: true,
+                    createdAt: true,
+                    user: {
                         select: {
-                            firstName: true,
-                            lastName: true,
+                            userId: true,
+                            userProfile: {
+                                select: {
+                                    firstName: true,
+                                    lastName: true,
+                                }
+                            }
                         }
                     }
                 }
             },
-            commentMessage: true,
-            commentId: true,
         }
     });
-    return res.json(formatAllComments(comments));
+    return res.json(formatCommentsOfPost(post));
 }
 
 // route to update a comment
