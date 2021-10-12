@@ -68,9 +68,9 @@ exports.getOneComment = async (req, res, next) => {
 function formatCommentsOfPost(prismaPost){
     const { userComments } = prismaPost;
     const comment = userComments.map(comment => {
-        const { commentMessage, createdAt, user, commentId } = comment;
+        const { commentMessage, createdAt, user, commentId, postId } = comment;
         const author = `${user.userProfile.firstName} ${user.userProfile.lastName}`;
-        const newComment = {createdAt, author, commentMessage, commentId }
+        const newComment = {createdAt, author, commentMessage, commentId, postId }
         return newComment
     })
     const newPost = { comment };
@@ -91,6 +91,8 @@ exports.getAllComments = async (req, res, next) => {
                 select: {
                     commentMessage: true,
                     createdAt: true,
+                    postId: true,
+                    commentId: true,
                     user: {
                         select: {
                             userId: true,
