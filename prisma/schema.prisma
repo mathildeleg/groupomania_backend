@@ -30,13 +30,13 @@ model UserProfile {
 
 model Administrator {
   adminId         Int       @id @default(autoincrement()) 
-  user            User      @relation(fields: [userId], references: [userId])
+  user            User      @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId          Int       
 }
 
 model UserForum {
   id              Int       @id @default(autoincrement()) 
-  forum           Forum     @relation(fields: [forumId], references: [forumId])
+  forum           Forum     @relation(fields: [forumId], references: [forumId], onDelete: Cascade)
   forumId         Int       
   user            User      @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId          Int         
@@ -53,11 +53,11 @@ model Forum {
 
 model Post {
   postId          Int       @id @default(autoincrement()) 
-  user            User      @relation(fields: [creatorId], references: [userId])
+  user            User      @relation(fields: [creatorId], references: [userId], onDelete: Cascade)
   creatorId       Int       
-  forum           Forum     @relation(fields: [forumId], references: [forumId])
+  forum           Forum     @relation(fields: [forumId], references: [forumId], onDelete: Cascade)
   forumId         Int       
-  content         Content   @relation(fields: [contentId], references: [contentId])
+  content         Content   @relation(fields: [contentId], references: [contentId], onDelete: Cascade)
   contentId       Int
   userLikes       UserLike[]
   userComments    Comment[]
@@ -75,31 +75,31 @@ model Content {
 model ContentUrl {
   id              Int       @id @default(autoincrement()) 
   contentUrl      String
-  content         Content   @relation(fields: [contentId], references: [contentId])
+  content         Content   @relation(fields: [contentId], references: [contentId], onDelete: Cascade)
   contentId       Int       
 }
 
 model ContentImage {
   id              Int       @id @default(autoincrement()) 
   imagePath       String
-  content         Content   @relation(fields: [contentId], references: [contentId])
+  content         Content   @relation(fields: [contentId], references: [contentId], onDelete: Cascade)
   contentId       Int       
 }
 
 model UserLike{
   likeId          Int       @id @default(autoincrement()) 
-  user            User      @relation(fields: [likerId], references: [userId])
+  user            User      @relation(fields: [likerId], references: [userId], onDelete: Cascade)
   likerId         Int       
-  post            Post      @relation(fields: [postId], references: [postId])
+  post            Post      @relation(fields: [postId], references: [postId], onDelete: Cascade)
   postId          Int       
   createdAt       DateTime  @default(now())
 }
 
 model Comment{
   commentId       Int       @id @default(autoincrement()) 
-  user            User      @relation(fields: [commenterId], references: [userId])
+  user            User      @relation(fields: [commenterId], references: [userId], onDelete: Cascade)
   commenterId     Int       
-  post            Post      @relation(fields: [postId], references: [postId])
+  post            Post      @relation(fields: [postId], references: [postId], onDelete: Cascade)
   postId          Int       
   commentMessage  String
   createdAt       DateTime  @default(now())
