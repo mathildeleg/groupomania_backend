@@ -267,7 +267,16 @@ exports.likePost = async (req, res, next) => {
             }
         }
     });
-    if(findPost.user.userId !== userId){
+    const hasLiked = await prisma.userLike.findMany({
+        where: {
+            postId: Number(postId),
+            likerId: userId,
+        },
+        select: {
+            postId: true,
+        }
+    });
+    if(findPost.user.userId !== userId && !hasLiked.length > 0){
         const like = await prisma.userLike.create({
             data: {
                 post: {
