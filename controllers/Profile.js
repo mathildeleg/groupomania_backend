@@ -64,9 +64,6 @@ exports.deleteProfile = async (req, res, next) => {
         where: {
             userId: Number(id),
         },
-        // select: {
-        //     userProfile: true,
-        // },
     });
     res.json(deletedProfile);
 }

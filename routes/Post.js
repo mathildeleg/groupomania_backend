@@ -13,5 +13,6 @@ router.put('/forum/:forumId/post/:postId', auth, postCtrl.updatePost);
 router.delete('/forum/:forumId/post/:postId', auth, postCtrl.deletePost);
 
 router.post('/forum/:forumId/post/:postId/like', auth, postCtrl.likePost);
+router.get('/forum/:forumId/post/:postId/like', auth, postCtrl.hasLiked);
 
 module.exports = router;

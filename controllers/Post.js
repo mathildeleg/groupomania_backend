@@ -287,3 +287,21 @@ exports.likePost = async (req, res, next) => {
         res.status(401).json({error: error | "Unauthorised"});
     }
 }
+
+exports.hasLiked = async (req, res, next) => {
+    // get post id
+    const postId = req.params.postId;
+    const userId = req.userId;
+    // user likes post
+    const hasLiked = await prisma.userLike.findMany({
+        where: {
+            postId: Number(postId),
+            likerId: userId,
+        },
+        select: {
+            postId: true,
+        }
+    });
+    return res.json({data: hasLiked.length > 0});
+}
+
