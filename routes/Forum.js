@@ -2,11 +2,12 @@ const express = require('express');
 const router = express.Router();
 
 const forumCtrl = require('../controllers/Forum');
+const authAdmin = require('../middleware/authAdmin');
 
-router.get('/', forumCtrl.getAllForums);
-router.post('/', forumCtrl.createForum);
-router.get('/:id', forumCtrl.getOneForum);
-router.put('/:id', forumCtrl.updateForum);
-router.delete('/:id', forumCtrl.deleteForum);
+router.get('/', authAdmin, forumCtrl.getAllForums);
+router.post('/', authAdmin, forumCtrl.createForum);
+router.get('/:id', authAdmin, forumCtrl.getOneForum);
+router.put('/:id', authAdmin, forumCtrl.updateForum);
+router.delete('/:id', authAdmin, forumCtrl.deleteForum);
 
 module.exports = router;

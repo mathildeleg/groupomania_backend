@@ -1,18 +1,18 @@
 const express = require('express');
 const router = express.Router();
 
-const auth = require('../middleware/auth');
+const authAdmin = require('../middleware/authAdmin');
 
 const adminCtrl = require('../controllers/Admin');
 
 // admin can delete a user
-router.delete('/profile/:userId', auth, adminCtrl.deleteUser);
+router.delete('/profile/:userId', authAdmin, adminCtrl.deleteUser);
 
 // admin can delete a post
-router.delete('/post/:postId', auth, adminCtrl.deletePost);
+router.delete('/post/:postId', authAdmin, adminCtrl.deletePost);
 
 // admin can delete a comment
-router.delete('/comment/:commentId', auth, adminCtrl.deleteComment); 
+router.delete('/comment/:commentId', authAdmin, adminCtrl.deleteComment); 
 
 // admin can create a forum
 // router.post('/', auth, adminCtrl.createForum);

@@ -1,9 +1,10 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
 
-function formatProfile(prismaProfile){
+function formatProfile(prismaProfile, isAdmin){
     const { email, firstName, lastName, avatar } = prismaProfile.userProfile;
-    const newProfile = { email, firstName, lastName, avatar };
+    const userId = prismaProfile.userId;
+    const newProfile = { email, firstName, lastName, avatar, userId, isAdmin };
     return newProfile;
 }
 
@@ -11,12 +12,19 @@ function formatProfile(prismaProfile){
 exports.getOneProfile = async (req, res, next) => {
     // get id of user currently connected
     const id = req.userId;
+    // check if user is admin
+    const admin = await prisma.administrator.findMany({
+        where: {
+            userId: Number(id),
+        },
+    })
     // get profile of user connected
     const profile = await prisma.user.findUnique({
         where: { 
             userId: Number(id),
         },
         select: {
+            userId: true,
             userProfile: {
                 select: {
                     email: true,
@@ -28,7 +36,7 @@ exports.getOneProfile = async (req, res, next) => {
         },
     });
     // return profile with correct format
-    res.json(formatProfile(profile));
+    res.json(formatProfile(profile, admin.length > 0));
 };
 
 // route to update a profile
