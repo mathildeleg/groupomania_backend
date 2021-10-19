@@ -9,6 +9,7 @@ const profileRoutes = require('./routes/Profile');
 const forumRoutes = require('./routes/Forum');
 const postRoutes = require('./routes/Post');
 const commentRoutes = require('./routes/Comment');
+const adminRoutes = require('./routes/Admin');
 
 const app = express();
 
@@ -30,5 +31,6 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/forum', forumRoutes);
 app.use('/api', postRoutes);
 app.use('/api', commentRoutes);
+app.use('/api', adminRoutes);
 
 module.exports = app;
