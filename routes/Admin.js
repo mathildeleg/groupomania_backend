@@ -6,10 +6,10 @@ const auth = require('../middleware/auth');
 const adminCtrl = require('../controllers/Admin');
 
 // admin can delete a user
-// router.delete('', auth, adminCtrl.deleteUser); ?
+router.delete('/profile/:userId', auth, adminCtrl.deleteUser);
 
 // admin can delete a post
-// router.delete('/forum/:forumId/post/:postId', auth, adminCtrl.deletePost); 
+router.delete('/post/:postId', auth, adminCtrl.deletePost);
 
 // admin can delete a comment
 router.delete('/comment/:commentId', auth, adminCtrl.deleteComment); 
