@@ -14,13 +14,7 @@ router.delete('/post/:postId', authAdmin, adminCtrl.deletePost);
 // admin can delete a comment
 router.delete('/comment/:commentId', authAdmin, adminCtrl.deleteComment); 
 
-// admin can create a forum
-// router.post('/', auth, adminCtrl.createForum);
-
-// admin can update a forum
-// router.put('/:id', auth, adminCtrl.updateForum);
-
-// admin can delete a forum
-// router.delete('/:id', auth, adminCtrl.deleteForum);
+// admin can fetch all profiles
+router.get('/profile', authAdmin, adminCtrl.getAllProfiles);
 
 module.exports = router;

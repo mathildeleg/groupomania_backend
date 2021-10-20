@@ -38,3 +38,33 @@ exports.deleteUser = async (req, res, next) => {
     });
     res.json(deletedProfile);
 }
+
+function formatProfiles(prismaProfile){
+    return profile = prismaProfile.map(profile => {
+        const { userId, userProfile } = profile;
+        const email = userProfile.email;
+        const firstName = userProfile.firstName;
+        const lastName = userProfile.lastName;
+        const avatar = userProfile.avatar;
+        const newProfile = { email, firstName, lastName, avatar, userId }
+        return newProfile
+    })
+}
+
+// route to fetch profiles of all users in order to delete a user if he wants to
+exports.getAllProfiles = async (req, res, next) => {
+    const profile = await prisma.user.findMany({
+        select: {
+            userId: true,
+            userProfile: {
+                select: {
+                    email: true,
+                    firstName: true,
+                    lastName: true,
+                    avatar: true,
+                }
+            },
+        },
+    })
+    return res.json(formatProfiles(profile))
+}
