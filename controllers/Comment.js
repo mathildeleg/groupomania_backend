@@ -31,7 +31,8 @@ exports.commentPost = async (req, res, next) => {
 function formatComment(prismaComment){
     const { postId, createdAt, user, commentMessage, commentId } = prismaComment;
     const author = `${user.userProfile.firstName} ${user.userProfile.lastName}`;
-    const newComment = { postId, createdAt, author, commentMessage, commentId };
+    const userId = user.userId;
+    const newComment = { postId, createdAt, author, commentMessage, commentId, userId };
     return newComment;
 }
 
@@ -70,7 +71,8 @@ function formatCommentsOfPost(prismaPost){
     const comment = userComments.map(comment => {
         const { commentMessage, createdAt, user, commentId, postId } = comment;
         const author = `${user.userProfile.firstName} ${user.userProfile.lastName}`;
-        const newComment = {createdAt, author, commentMessage, commentId, postId }
+        const userId = user.userId;
+        const newComment = {createdAt, author, commentMessage, commentId, postId, userId }
         return newComment
     })
     const newPost = { comment };

@@ -111,11 +111,12 @@ exports.updatePost = async (req, res, next) => {
 function formatPost(prismaPost){
     const { postId, createdAt, user, content, _count } = prismaPost;
     const author = `${user.userProfile.firstName} ${user.userProfile.lastName}`;
+    const userId = user.userId;
     const contentMessage = content.postMessage;
     const contentImg = content.contentImg ? content.contentImg.imagePath : null;
     const commentsCount = _count.userComments;
     const likesCount = _count.userLikes;
-    const newPost = { postId, createdAt, author, contentMessage, contentImg, commentsCount, likesCount };
+    const newPost = { postId, createdAt, author, userId, contentMessage, contentImg, commentsCount, likesCount };
     return newPost
 }
 
