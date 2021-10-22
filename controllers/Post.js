@@ -10,7 +10,6 @@ exports.createPost = async (req, res, next) => {
     const userId = req.userId;
     // get content of post
     const postMessage = req.body.postMessage;
-    const imagePath = req.body.imagePath;
     // create post
     const newPost = await prisma.post.create({
         data: {
@@ -38,9 +37,10 @@ exports.createPost = async (req, res, next) => {
         } else {
             // add image url to post
             const contentId = newPost.contentId;
+            const imagePath = req.body.imagePath;
             const newContent = await prisma.contentImage.create({
                 data: {
-                    imagePath: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+                    imagePath: imagePath,
                     content: {
                         connect: {
                             contentId: contentId,
@@ -48,7 +48,7 @@ exports.createPost = async (req, res, next) => {
                     }
                 }
             });
-            console.log(newContent);
+            return res.json(newContent);
         }
     } catch(error){
         console.log(error);
