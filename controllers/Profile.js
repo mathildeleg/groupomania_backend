@@ -67,11 +67,25 @@ exports.updateProfile = async (req, res, next) => {
 exports.deleteProfile = async (req, res, next) => {
     // get id of profile
     const id = req.userId;
-    // delete profile corresponding
-    const deletedProfile = await prisma.user.delete({
+    const findUser = await prisma.user.findUnique({
         where: {
             userId: Number(id),
         },
+        select: {
+            userId: true,
+            profileId: true,
+        }
+    })
+    // delete profile corresponding
+    const deleteProfile = prisma.user.delete({
+        where: {
+            userId: Number(findUser.userId),
+        },
     });
-    res.json(deletedProfile);
+    const deleteUserProfile = prisma.userProfile.delete({
+        where: {
+            profileId: Number(findUser.profileId),
+        }
+    })
+    await prisma.$transaction([deleteProfile, deleteUserProfile])
 }
