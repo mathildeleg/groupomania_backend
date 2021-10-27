@@ -10,6 +10,14 @@ const emailValidator = require("email-validator");
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
 
+const token = (userId) => {
+    return jwt.sign(
+        { userId: userId },
+        process.env.JWT_PRIVATE_KEY,
+        { expiresIn: '24h' }
+    )
+}
+
 // schema for password validation to ensure password has those conditions
 const schema = new passwordValidator();
 schema
@@ -67,7 +75,10 @@ exports.signup = async (req, res) => {
         });
         console.log(userForum1);
         console.log(userForum2);
-        return res.json(newUser);
+        return res.json({
+            userId: newUser.userId,
+            token: token(newUser.userId),
+        })
     } catch(error) {
         console.log(error);
     }
@@ -104,11 +115,7 @@ exports.login = async (req, res) => {
             // if password is matched, then give token to user
             return res.json({
                 userId: userProfile.user.userId,
-                token: jwt.sign(
-                    { userId: userProfile.user.userId },
-                    process.env.JWT_PRIVATE_KEY,
-                    { expiresIn: '24h' }
-                )
+                token: token(userProfile.user.userId),
             })
         }
     } catch(error) {
