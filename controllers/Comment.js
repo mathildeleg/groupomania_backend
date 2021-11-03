@@ -28,6 +28,7 @@ exports.commentPost = async (req, res, next) => {
     return res.json(newComment);
 };
 
+// format comments to only have one object 
 function formatComment(prismaComment){
     const { postId, createdAt, user, commentMessage, commentId } = prismaComment;
     const author = `${user.userProfile.firstName} ${user.userProfile.lastName}`;
@@ -66,6 +67,7 @@ exports.getOneComment = async (req, res, next) => {
     return res.json(formatComment(comment));
 };
 
+// format comments to only have one object 
 function formatCommentsOfPost(prismaPost){
     const { userComments } = prismaPost;
     const comment = userComments.map(comment => {
@@ -123,6 +125,7 @@ exports.updateComment = async (req, res, next) => {
     const commentMessage = req.body.commentMessage;
     // get id of the comment 
     const commentId = req.params.commentId;
+    // find creator of the comment
     const findComment = await prisma.comment.findUnique({
         where: {
             commentId: Number(commentId),
@@ -135,6 +138,7 @@ exports.updateComment = async (req, res, next) => {
             }
         }
     });
+    // allow creator of comment to update it
     if(findComment.user.userId === userId){
         // update the content of the comment according to its id w/ post id and user id
         const updatedComment = await prisma.comment.update({
@@ -156,6 +160,7 @@ exports.updateComment = async (req, res, next) => {
             },
         });
         return res.json(updatedComment);
+    // otherwise not allowed
     } else {
         res.status(401).json({error: error | "Unauthorised"});
     }
@@ -165,8 +170,9 @@ exports.updateComment = async (req, res, next) => {
 exports.deleteComment = async (req, res, next) => {
     // get id of the comment
     const commentId = req.params.commentId;
+    // get id of commenter 
     const userId = req.userId;
-    // get id of commenter
+    // find creator of the comment
     const findComment = await prisma.comment.findUnique({
         where: {
             commentId: Number(commentId),

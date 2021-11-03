@@ -10,6 +10,7 @@ const emailValidator = require("email-validator");
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
 
+// create token that only lasts for 24h
 const token = (userId) => {
     return jwt.sign(
         { userId: userId },
@@ -75,6 +76,7 @@ exports.signup = async (req, res) => {
         });
         console.log(userForum1);
         console.log(userForum2);
+        // give token to user upon signing in
         return res.json({
             userId: newUser.userId,
             token: token(newUser.userId),
@@ -112,7 +114,7 @@ exports.login = async (req, res) => {
                 return res.status(401).json({ error: 'Mot de passe incorrect !' })
             }
         } finally {
-            // if password is matched, then give token to user
+            // if password is matched, then give token to user upon logging in
             return res.json({
                 userId: userProfile.user.userId,
                 token: token(userProfile.user.userId),

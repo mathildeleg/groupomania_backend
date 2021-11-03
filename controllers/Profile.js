@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
 
+// format profile to have only one object instead of several
 function formatProfile(prismaProfile, isAdmin){
     const { email, firstName, lastName, avatar } = prismaProfile.userProfile;
     const userId = prismaProfile.userId;
@@ -44,7 +45,7 @@ exports.updateProfile = async (req, res, next) => {
     // get id of profile
     const id = req.userId;
     const { email, avatar, firstName, lastName } = req.body;
-    // update only email and avatar of profile
+    // update only email, last name and first name and avatar of profile
     const updatedProfile = await prisma.user.update({
         where: {
             userId: Number(id),
@@ -67,6 +68,7 @@ exports.updateProfile = async (req, res, next) => {
 exports.deleteProfile = async (req, res, next) => {
     // get id of profile
     const id = req.userId;
+    // find profile of user connected
     const findUser = await prisma.user.findUnique({
         where: {
             userId: Number(id),
@@ -82,6 +84,7 @@ exports.deleteProfile = async (req, res, next) => {
             userId: Number(findUser.userId),
         },
     });
+    // delete user profile corresponding
     const deleteUserProfile = prisma.userProfile.delete({
         where: {
             profileId: Number(findUser.profileId),

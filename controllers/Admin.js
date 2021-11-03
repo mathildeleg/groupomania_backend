@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 exports.deleteComment = async (req, res, next) => {
     // get id of the comment
     const commentId = req.params.commentId;
+    // delete comment
     const comment = await prisma.comment.delete({
         where: {
             commentId: Number(commentId),
@@ -17,6 +18,7 @@ exports.deleteComment = async (req, res, next) => {
 exports.deletePost = async (req, res, next) => {
     // get post id
     const postId = req.params.postId;
+    // delete post
     const deletePost = await prisma.post.delete({
         where: {
             postId: Number(postId),
@@ -39,6 +41,7 @@ exports.deleteUser = async (req, res, next) => {
     res.json(deletedProfile);
 }
 
+// format profiles to only have one object with strings instead of several objects
 function formatProfiles(prismaProfile){
     return profile = prismaProfile.map(profile => {
         const { userId, userProfile } = profile;

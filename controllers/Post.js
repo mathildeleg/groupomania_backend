@@ -10,7 +10,7 @@ exports.createPost = async (req, res, next) => {
     const userId = req.userId;
     // get content of post
     const postMessage = req.body.postMessage;
-    // create post
+    // create post inside correct forum
     const newPost = await prisma.post.create({
         data: {
             content: {
@@ -51,7 +51,7 @@ exports.createPost = async (req, res, next) => {
             return res.json(newContent);
         }
     } catch(error){
-        console.log(error);
+        return res.status(401).json({error: error});
     }
     return res.json(newPost);
 }
@@ -66,7 +66,7 @@ exports.updatePost = async (req, res, next) => {
     const userId = req.userId;
     // get content of the post
     const postMessage = req.body.postMessage;
-    // update the post
+    // find the creator of the post
     const findPost = await prisma.post.findUnique({
         where: {
             postId: Number(postId),
@@ -79,6 +79,7 @@ exports.updatePost = async (req, res, next) => {
             }
         }
     });
+    // only the creator can update the post
     if(findPost.user.userId === userId){
         const updatedPost = await prisma.post.update({
             where: {
@@ -103,11 +104,13 @@ exports.updatePost = async (req, res, next) => {
             },
         });
         return res.json(updatedPost);
+    // otherwise they're not allowed
     } else {
-        res.status(401).json({error: error | "Unauthorised"});
+        return res.status(401).json({error: error | "Unauthorised"});
     }
 }
 
+// format posts to have one object containing strings, instead of several objects
 function formatPost(prismaPost){
     const { postId, createdAt, user, content, _count } = prismaPost;
     const author = `${user.userProfile.firstName} ${user.userProfile.lastName}`;
@@ -158,6 +161,7 @@ exports.getOnePost = async (req, res, next) => {
     return res.json(formatPost(post));
 }
 
+// format posts to have one object containing strings, instead of several objects
 function formatAllPosts(prismaAllPosts){
     return prismaAllPosts.map(post => {
         const { postId, createdAt, user, content, _count } = post;
@@ -174,6 +178,7 @@ function formatAllPosts(prismaAllPosts){
 
 // routes to get all posts
 exports.getAllPosts = async (req, res, next) => {
+    // in order to only show/download a couple of posts at a time
     const skip = parseInt(req.query.start) ?? 0;
     const take = req.query.end ? parseInt(req.query.end) - skip : undefined ;
     // find posts and display their contents, their comments and their likes
@@ -215,7 +220,9 @@ exports.getAllPosts = async (req, res, next) => {
 exports.deletePost = async (req, res, next) => {
     // get post id
     const postId = req.params.postId;
+    // get user id
     const userId = req.userId;
+    // find creator of post
     const findPost = await prisma.post.findUnique({
         where: {
             postId: Number(postId),
@@ -228,25 +235,17 @@ exports.deletePost = async (req, res, next) => {
             }
         }
     });
-    // get image from post
-    // const filename = post.imagePath.split('/images/')[1];
+    // only creator of post can delete their post
     if(findPost.user.userId === userId){
         const deletePost = await prisma.post.delete({
             where: {
                 postId: Number(postId),
             }
         })
-    // delete image as well as the post
-    // fs.unlink(`images/${filename}`, async () => { 
-        // await prisma.post.delete({
-        //     where: {
-        //         postId: Number(postId),
-        //     }
-        // });
-    // });
         return res.json(deletePost)
+    // otherwise they're not allowed
     } else {
-        res.status(401).json({error: error | "Unauthorised"});
+        return res.status(401).json({error: error | "Unauthorised"});
     }
 };
 
@@ -256,7 +255,7 @@ exports.likePost = async (req, res, next) => {
     const postId = req.params.postId;
     // get user id
     const userId = req.userId;
-    // user likes post
+    // find creator of post
     const findPost = await prisma.post.findUnique({
         where: {
             postId: Number(postId),
@@ -269,6 +268,7 @@ exports.likePost = async (req, res, next) => {
             }
         }
     });
+    // check to see if user has already liked the post or not
     const hasLiked = await prisma.userLike.findMany({
         where: {
             postId: Number(postId),
@@ -278,6 +278,7 @@ exports.likePost = async (req, res, next) => {
             postId: true,
         }
     });
+    // if it's not the creator of the post and if they haven't already liked it, they can like the post
     if(findPost.user.userId !== userId && !hasLiked.length > 0){
         const like = await prisma.userLike.create({
             data: {
@@ -294,16 +295,18 @@ exports.likePost = async (req, res, next) => {
             },
         });
         return res.json(like);
+    // otherwise they're not allowed
     } else {
-        res.status(401).json({error: error | "Unauthorised"});
+        return res.status(401).json({error: error | "Unauthorised"});
     }
 }
 
 exports.hasLiked = async (req, res, next) => {
     // get post id
     const postId = req.params.postId;
+    // get user id
     const userId = req.userId;
-    // user likes post
+    // check if user has liked post
     const hasLiked = await prisma.userLike.findMany({
         where: {
             postId: Number(postId),
