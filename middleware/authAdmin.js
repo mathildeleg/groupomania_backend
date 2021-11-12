@@ -1,12 +1,13 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
+const {getToken} = require('../helpers/auth')
 
 // create token for admin
 const jwt = require('jsonwebtoken');
 
 module.exports = async (req, res, next) => {
   try {
-    const token = req.headers.authorization.split(' ')[1];
+    const token = getToken(req)
     const decodedToken = jwt.verify(token, process.env.JWT_PRIVATE_KEY);
     const userId = decodedToken.userId;
     // check if user is admin or not
