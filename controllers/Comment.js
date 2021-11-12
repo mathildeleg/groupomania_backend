@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
+const {responseSuccess, responseError, ErrorLabel} = require('../helpers/response')
 
 // route to comment a post
 exports.commentPost = async (req, res, next) => {
@@ -25,7 +26,7 @@ exports.commentPost = async (req, res, next) => {
             }
         },
     });
-    return res.json(newComment);
+    return responseSuccess(res, newComment);
 };
 
 // format comments to only have one object 
@@ -64,7 +65,7 @@ exports.getOneComment = async (req, res, next) => {
             commentId: true,
         }
     });
-    return res.json(formatComment(comment));
+    return responseSuccess(res, formatComment(comment));
 };
 
 // format comments to only have one object 
@@ -112,7 +113,7 @@ exports.getAllComments = async (req, res, next) => {
             },
         }
     });
-    return res.json(formatCommentsOfPost(post));
+    return responseSuccess(res, formatCommentsOfPost(post));
 }
 
 // route to update a comment
@@ -159,10 +160,10 @@ exports.updateComment = async (req, res, next) => {
                 }
             },
         });
-        return res.json(updatedComment);
+        return responseSuccess(res, updatedComment);
     // otherwise not allowed
     } else {
-        res.status(401).json({error: error | "Unauthorised"});
+        return responseError(res, ErrorLabel.Unauthorised)
     }
 };
 
@@ -192,8 +193,8 @@ exports.deleteComment = async (req, res, next) => {
                 commentId: Number(commentId),
             },   
         });
-        return res.json(comment);
+        return responseSuccess(res, comment);
     } else {
-        res.status(401).json({error: error | "Unauthorised"});
+        return responseError(res, ErrorLabel.Unauthorised)
     }
 }

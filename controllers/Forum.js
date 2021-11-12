@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
+const {responseSuccess} = require('../helpers/response')
 
 // routes to create a forum
 exports.createForum = async (req, res, next) => {
@@ -13,7 +14,7 @@ exports.createForum = async (req, res, next) => {
             description: description,
         },
     });
-    return res.json(newForum);
+    return responseSuccess(res, newForum);
 }
 
 // route to get one forum
@@ -26,14 +27,14 @@ exports.getOneForum = async (req, res, next) => {
             forumId: Number(id),
         }
     });
-    res.json(forum);
+    return responseSuccess(res, forum);
 };
 
 // route to get all forums
 exports.getAllForums = async (req, res, next) => {
     // find all forums
     const forums = await prisma.forum.findMany();
-    res.json(forums);
+    return responseSuccess(res, forums);
 };
 
 // route to update a forum - only accessible to admins
@@ -52,7 +53,7 @@ exports.updateForum = async (req, res, next) => {
                 description,
         },
     });
-    res.json(updatedForum);
+    return responseSuccess(res, updatedForum);
 }
 
 // route to delete a forum - only accessible to admins
@@ -65,5 +66,5 @@ exports.deleteForum = async (req, res, next) => {
             forumId: Number(id),
         },
     });
-    res.json(deletedForum);
+    return responseSuccess(res, deletedForum);
 }

@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const passwordValidator = require('password-validator');
 // add email-validator package to check if email is valid
 const emailValidator = require("email-validator");
+const {responseSuccess, responseError, ErrorLabel} = require('../helpers/response')
 
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
@@ -37,11 +38,11 @@ exports.signup = async (req, res) => {
     const { email, password, firstName, lastName, avatar } = userProfile;
     // check if password follows valid schema
     if(!schema.validate(password)){
-        return res.status(400).json({ error: 'Mot de passe non valide !' })
+        return responseError(res, ErrorLabel.UnvalidPassword)
     }
     // check if email is valid
     if(!emailValidator.validate(email)){
-        return res.status(400).json({ error: 'Email non valide !' })
+        return responseError(res, ErrorLabel.UnvalidEmail)
     }
     // create hash for password
     const salt = await bcrypt.genSalt(10);
@@ -77,7 +78,7 @@ exports.signup = async (req, res) => {
         console.log(userForum1);
         console.log(userForum2);
         // give token to user upon signing in
-        return res.json({
+        return responseSuccess(res, {
             userId: newUser.userId,
             token: token(newUser.userId),
         })
@@ -105,17 +106,17 @@ exports.login = async (req, res) => {
     try {
         // check if user exists
         if (!userProfile){
-            return res.status(401).json({ error: 'Utilisateur non trouvé !' })
+            return responseError(res, ErrorLabel.NotFound)
         } 
         // check if password entered is the same as password upon signing up
         const matchedPassword = await bcrypt.compare(req.body.password, userProfile.password)
         try {
             if (!matchedPassword){
-                return res.status(401).json({ error: 'Mot de passe incorrect !' })
+                return responseError(res, ErrorLabel.UnvalidEmail)
             }
         } finally {
             // if password is matched, then give token to user upon logging in
-            return res.json({
+            return responseSuccess(res, {
                 userId: userProfile.user.userId,
                 token: token(userProfile.user.userId),
             })

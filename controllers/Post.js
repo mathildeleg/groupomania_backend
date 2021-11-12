@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
 const fs = require('fs');
+const {responseSuccess, responseError, ErrorLabel} = require('../helpers/response')
 
 // routes for content with image 
 exports.createPost = async (req, res, next) => {
@@ -33,7 +34,7 @@ exports.createPost = async (req, res, next) => {
     try {
         // check if post exists
         if(!newPost){
-            return res.status(401).json({ error: 'Post non trouvé !' })
+            return responseError(res, ErrorLabel.NotFound)
         } else {
             // add image url to post
             const contentId = newPost.contentId;
@@ -48,12 +49,12 @@ exports.createPost = async (req, res, next) => {
                     }
                 }
             });
-            return res.json(newContent);
+            return responseSuccess(res, newContent);
         }
     } catch(error){
-        return res.status(401).json({error: error});
+        return responseError(res, ErrorLabel.NotCreated)
     }
-    return res.json(newPost);
+    return responseSuccess(res, newPost);
 }
 
 // route to update a post (only message of the post, not the image)
@@ -103,10 +104,10 @@ exports.updatePost = async (req, res, next) => {
                 }
             },
         });
-        return res.json(updatedPost);
+        return responseSuccess(res, updatedPost);
     // otherwise they're not allowed
     } else {
-        return res.status(401).json({error: error | "Unauthorised"});
+        return responseError(res, ErrorLabel.Unauthorised)
     }
 }
 
@@ -158,7 +159,7 @@ exports.getOnePost = async (req, res, next) => {
             }
         }
     });
-    return res.json(formatPost(post));
+    return responseSuccess(res, formatPost(post));
 }
 
 // format posts to have one object containing strings, instead of several objects
@@ -213,7 +214,7 @@ exports.getAllPosts = async (req, res, next) => {
             }
         }
     });
-    return res.json(formatAllPosts(posts));
+    return responseSuccess(res, formatAllPosts(posts));
 }
 
 // route to delete a post
@@ -242,10 +243,10 @@ exports.deletePost = async (req, res, next) => {
                 postId: Number(postId),
             }
         })
-        return res.json(deletePost)
+        return responseSuccess(res, deletePost)
     // otherwise they're not allowed
     } else {
-        return res.status(401).json({error: error | "Unauthorised"});
+        return responseError(res, ErrorLabel.Unauthorised)
     }
 };
 
@@ -294,10 +295,10 @@ exports.likePost = async (req, res, next) => {
                 }
             },
         });
-        return res.json(like);
+        return responseSuccess(res, like);
     // otherwise they're not allowed
     } else {
-        return res.status(401).json({error: error | "Unauthorised"});
+        return responseError(res, ErrorLabel.Unauthorised)
     }
 }
 
@@ -316,6 +317,6 @@ exports.hasLiked = async (req, res, next) => {
             postId: true,
         }
     });
-    return res.json({data: hasLiked.length > 0});
+    return responseSuccess(res, {data: hasLiked.length > 0});
 }
 

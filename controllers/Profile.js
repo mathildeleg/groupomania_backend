@@ -1,5 +1,7 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
+const {responseSuccess} = require('../helpers/response')
+
 
 // format profile to have only one object instead of several
 function formatProfile(prismaProfile, isAdmin){
@@ -37,7 +39,7 @@ exports.getOneProfile = async (req, res, next) => {
         },
     });
     // return profile with correct format
-    res.json(formatProfile(profile, admin.length > 0));
+    return responseSuccess(res, formatProfile(profile, admin.length > 0));
 };
 
 // route to update a profile
@@ -61,7 +63,7 @@ exports.updateProfile = async (req, res, next) => {
             }
         },
     });
-    res.json(updatedProfile);
+    return responseSuccess(res, updatedProfile);
 }
 
 // route to delete a profile

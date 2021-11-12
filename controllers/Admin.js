@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
+const {responseSuccess} = require('../helpers/response')
 
 // route to delete a comment
 exports.deleteComment = async (req, res, next) => {
@@ -11,7 +12,7 @@ exports.deleteComment = async (req, res, next) => {
             commentId: Number(commentId),
         },
     });
-    return res.json(comment);
+    return responseSuccess(res, comment);
 }
 
 // route to delete a post
@@ -24,21 +25,20 @@ exports.deletePost = async (req, res, next) => {
             postId: Number(postId),
         }
     })
-    return res.json(deletePost)
+    return responseSuccess(res, deletePost)
 };
 
 // route to delete a profile
 exports.deleteUser = async (req, res, next) => {
     // get id of profile
     const id = req.params.userId;
-    console.log(id)
     // delete profile corresponding
     const deletedProfile = await prisma.user.delete({
         where: {
             userId: Number(id),
         },
     });
-    res.json(deletedProfile);
+    responseSuccess(res, deletedProfile);
 }
 
 // format profiles to only have one object with strings instead of several objects
@@ -69,5 +69,5 @@ exports.getAllProfiles = async (req, res, next) => {
             },
         },
     })
-    return res.json(formatProfiles(profile))
+    return responseSuccess(res, formatProfiles(profile))
 }
