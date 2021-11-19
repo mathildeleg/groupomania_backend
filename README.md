@@ -7,11 +7,16 @@ Pour installer le back-end :
 - cloner le repository,
 - lancer la commande suivante :
     - ```npm install```
-- créer une database sous mySQL workbench,
-- créer un fichier .env selon le template avec les données requises,
+- créer une database mySQL en local (outil conseillé : mySQL Workbench),
+- créer un fichier .env selon le template avec les données requises :
+    - DATABASE_URL : url d'une base de données mySQL, exemple : "mysql://root:motdepasse@localhost:3306/nombasededonnées",
+    - JWT_PRIVATE_KEY : chaîne de caractères, idéalement une clé SHA-1 ou MD5.
 - lancer les commandes suivantes :
-    - ```npx prisma generate```(pour générer les outils prisma dans node_modules),
+    - ```npx prisma generate```
+(pour générer les outils prisma dans node_modules),
     - ```npx prisma migrate dev```
+- lancer le serveur avec la commande suivante :
+    - ```npm run start```
 - installer le front-end pour accéder au site
 
 Repository du front-end :
