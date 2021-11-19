@@ -69,14 +69,7 @@ exports.signup = async (req, res) => {
                 userId: newUser.userId,
             }
         });
-        const userForum2 = await prisma.userForum.create({
-            data: {
-                forumId: 2,
-                userId: newUser.userId,
-            }
-        });
         console.log(userForum1);
-        console.log(userForum2);
         // give token to user upon signing in
         return responseSuccess(res, {
             userId: newUser.userId,

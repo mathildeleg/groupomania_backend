@@ -147,3 +147,6 @@ ALTER TABLE `Comment` ADD CONSTRAINT `Comment_commenterId_fkey` FOREIGN KEY (`co
 
 -- AddForeignKey
 ALTER TABLE `Comment` ADD CONSTRAINT `Comment_postId_fkey` FOREIGN KEY (`postId`) REFERENCES `Post`(`postId`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- Insert forum
+INSERT INTO `Forum` (`title`, `description`, `createdAt`) VALUES ('forum1', 'forum with images', '2021-11-19');

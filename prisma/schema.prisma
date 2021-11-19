@@ -1,106 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model User {
-  userId          Int       @id @default(autoincrement())  
-  admin           Administrator?
-  userForum       UserForum[]
-  post            Post[]
-  like            UserLike[]
-  comment         Comment[]
-  userProfile     UserProfile @relation(fields: [profileId], references: [profileId], onDelete: Cascade)
-  profileId       Int
+  userId      Int            @id @default(autoincrement())
+  profileId   Int            @unique(map: "User_profileId_unique")
+  userProfile UserProfile    @relation(fields: [profileId], references: [profileId], onDelete: Cascade)
+  admin       Administrator?
+  comment     Comment[]
+  post        Post[]
+  userForum   UserForum[]
+  like        UserLike[]
 }
 
 model UserProfile {
-  profileId       Int       @id @default(autoincrement()) 
-  email           String    @unique
-  password        String    
-  firstName       String
-  lastName        String     
-  avatar          String       
-  user            User?
+  profileId Int    @id @default(autoincrement())
+  email     String @unique
+  password  String
+  firstName String
+  lastName  String
+  avatar    String
+  user      User?
 }
 
 model Administrator {
-  adminId         Int       @id @default(autoincrement()) 
-  user            User      @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  userId          Int       
+  adminId Int  @id @default(autoincrement())
+  userId  Int  @unique(map: "Administrator_userId_unique")
+  user    User @relation(fields: [userId], references: [userId], onDelete: Cascade)
 }
 
 model UserForum {
-  id              Int       @id @default(autoincrement()) 
-  forum           Forum     @relation(fields: [forumId], references: [forumId], onDelete: Cascade)
-  forumId         Int       
-  user            User      @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  userId          Int         
+  id      Int   @id @default(autoincrement())
+  forumId Int
+  userId  Int
+  forum   Forum @relation(fields: [forumId], references: [forumId], onDelete: Cascade)
+  user    User  @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@index([forumId], map: "UserForum_forumId_fkey")
+  @@index([userId], map: "UserForum_userId_fkey")
 }
 
 model Forum {
-  forumId         Int       @id @default(autoincrement()) 
-  userForums      UserForum[]
-  posts           Post[]
-  title           String
-  description     String
-  createdAt       DateTime  @default(now())
+  forumId     Int         @id @default(autoincrement())
+  title       String
+  description String
+  createdAt   DateTime    @default(now())
+  posts       Post[]
+  userForums  UserForum[]
 }
 
 model Post {
-  postId          Int       @id @default(autoincrement()) 
-  user            User      @relation(fields: [creatorId], references: [userId], onDelete: Cascade)
-  creatorId       Int       
-  forum           Forum     @relation(fields: [forumId], references: [forumId], onDelete: Cascade)
-  forumId         Int       
-  content         Content   @relation(fields: [contentId], references: [contentId], onDelete: Cascade)
-  contentId       Int
-  userLikes       UserLike[]
-  userComments    Comment[]
-  createdAt       DateTime  @default(now())
+  postId       Int        @id @default(autoincrement())
+  creatorId    Int
+  forumId      Int
+  contentId    Int        @unique(map: "Post_contentId_unique")
+  createdAt    DateTime   @default(now())
+  content      Content    @relation(fields: [contentId], references: [contentId], onDelete: Cascade)
+  user         User       @relation(fields: [creatorId], references: [userId], onDelete: Cascade)
+  forum        Forum      @relation(fields: [forumId], references: [forumId], onDelete: Cascade)
+  userComments Comment[]
+  userLikes    UserLike[]
+
+  @@index([creatorId], map: "Post_creatorId_fkey")
+  @@index([forumId], map: "Post_forumId_fkey")
 }
 
 model Content {
-  contentId       Int       @id @default(autoincrement()) 
-  postMessage     String
-  post            Post?     
-  contentUrl      ContentUrl?
-  contentImg      ContentImage?
+  contentId   Int           @id @default(autoincrement())
+  postMessage String
+  contentImg  ContentImage?
+  contentUrl  ContentUrl?
+  post        Post?
 }
 
 model ContentUrl {
-  id              Int       @id @default(autoincrement()) 
-  contentUrl      String
-  content         Content   @relation(fields: [contentId], references: [contentId], onDelete: Cascade)
-  contentId       Int       
+  id         Int     @id @default(autoincrement())
+  contentUrl String
+  contentId  Int     @unique(map: "ContentUrl_contentId_unique")
+  content    Content @relation(fields: [contentId], references: [contentId], onDelete: Cascade)
 }
 
 model ContentImage {
-  id              Int       @id @default(autoincrement()) 
-  imagePath       String
-  content         Content   @relation(fields: [contentId], references: [contentId], onDelete: Cascade)
-  contentId       Int       
+  id        Int     @id @default(autoincrement())
+  imagePath String
+  contentId Int     @unique(map: "ContentImage_contentId_unique")
+  content   Content @relation(fields: [contentId], references: [contentId], onDelete: Cascade)
 }
 
-model UserLike{
-  likeId          Int       @id @default(autoincrement()) 
-  user            User      @relation(fields: [likerId], references: [userId], onDelete: Cascade)
-  likerId         Int       
-  post            Post      @relation(fields: [postId], references: [postId], onDelete: Cascade)
-  postId          Int       
-  createdAt       DateTime  @default(now())
+model UserLike {
+  likeId    Int      @id @default(autoincrement())
+  likerId   Int
+  postId    Int
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [likerId], references: [userId], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [postId], onDelete: Cascade)
+
+  @@index([likerId], map: "UserLike_likerId_fkey")
+  @@index([postId], map: "UserLike_postId_fkey")
 }
 
-model Comment{
-  commentId       Int       @id @default(autoincrement()) 
-  user            User      @relation(fields: [commenterId], references: [userId], onDelete: Cascade)
-  commenterId     Int       
-  post            Post      @relation(fields: [postId], references: [postId], onDelete: Cascade)
-  postId          Int       
-  commentMessage  String
-  createdAt       DateTime  @default(now())
+model Comment {
+  commentId      Int      @id @default(autoincrement())
+  commenterId    Int
+  postId         Int
+  commentMessage String
+  createdAt      DateTime @default(now())
+  user           User     @relation(fields: [commenterId], references: [userId], onDelete: Cascade)
+  post           Post     @relation(fields: [postId], references: [postId], onDelete: Cascade)
+
+  @@index([commenterId], map: "Comment_commenterId_fkey")
+  @@index([postId], map: "Comment_postId_fkey")
 }
