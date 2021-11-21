@@ -19,5 +19,8 @@ Pour installer le back-end :
     - ```npm run start```
 - installer le front-end pour accéder au site
 
+Si vous souhaitez ajouter un administrateur, vous pouvez utiliser mySQL Workbench ainsi (en ajoutant, à la place du 28, l'id de l'utilisateur que vous avez crée pour ce compte admin, que vous trouverez dans la table "User"):
+```INSERT INTO `db_groupomania`.`Administrator` (`adminId`, `userId`) VALUES ('', '28');```
+
 Repository du front-end :
 https://github.com/mathildeleg/groupomania_frontend
